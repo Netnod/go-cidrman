@@ -64,9 +64,8 @@ In April 2022, a `merge-experimental` branch was temporarily used to merge the o
 together with the IPv6 support developed in this fork.
 With IPv6 support now in `main`, the `ipv6-experimental` branch was removed as it's no longer relevant in this fork.
 
+New `RemoveCIDRs` functions were added (in June 2022) to remove/exclude CIDR blocks or IP ranges.
 
-New `removeCIDRs` functions to be able to remove/exclude CIDR blocks or IP ranges was added in June 2022.
+## Upcoming
 
-## The future
-
-For the time being, all needed features have been added to support Netnod's internal development needs.
+New `SubsetCIDRs` functions are planned to select specific CIDR blocks or IP ranges to keep.
