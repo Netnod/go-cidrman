@@ -6,6 +6,8 @@ import (
 
 // RemoveIPNets accepts two lists of mixed IP networks and removes the second list from the first and return a new list of IPNets.
 // The remove will return the smallest possible list of IPNets.
+// Example:
+//     routableNets, err := RemoveIPNets(mixedListOfNets, rfc1918nets)
 func RemoveIPNets(nets, rmnets []*net.IPNet) ([]*net.IPNet, error) {
 	if nets == nil {
 		return nil, nil
@@ -20,7 +22,7 @@ func RemoveIPNets(nets, rmnets []*net.IPNet) ([]*net.IPNet, error) {
 		return nets, nil
 	}
 
-	// Mergs nets and rmnet individually to have the miminal set of largets networks
+	// Merge nets and rmnet individually to have the miminal set of largets networks
 	nets, err := MergeIPNets(nets)
 	if err != nil {
 		return nil, err
