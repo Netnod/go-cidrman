@@ -66,6 +66,11 @@ With IPv6 support now in `main`, the `ipv6-experimental` branch was removed as i
 
 New `RemoveCIDRs` functions were added (in June 2022) to remove/exclude CIDR blocks or IP ranges.
 
-## Upcoming
+## Next to come
 
-New `SubsetCIDRs` functions are planned to select specific CIDR blocks or IP ranges to keep.
+New `SubsetCIDRs` functions in progress to select specific CIDR blocks or IP ranges to keep.
+A bit lite the oposite of RemoveCIDRs, this selects what to keep instead of what to remove.
+
+## The future
+
+For the time being, all needed features have been added to support Netnod's internal development needs.
