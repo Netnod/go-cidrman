@@ -186,3 +186,71 @@ func merge6(blocks cidrBlock6s) ([]*net.IPNet, error) {
 	}
 	return merged, nil
 }
+
+// remove6 accepts two lists of IPv6 networks and removes the second list from the first and return a new list of IPNets.
+// The remove will return the smallest possible list of IPNets.
+func remove6(blocks, removes cidrBlock6s) ([]*net.IPNet, error) {
+	sort.Sort(blocks)
+	sort.Sort(removes)
+
+	i := 0
+	j := 0
+	for i < len(blocks) {
+		if j >= len(removes) {
+			// No more remove blocks to compare with
+			break
+		}
+		if removes[j].last.Cmp(blocks[i].first) < 0 {
+			// Remove-block entirely before network-block, use next remove-block
+			j++
+		} else if blocks[i].last.Cmp(removes[j].first) < 0 {
+			// Network-block entirely before remove-block, keep block and continue to next
+			i++
+		} else if blocks[i].first.Cmp(removes[j].first) >= 0 && blocks[i].last.Cmp(removes[j].last) <= 0 {
+			// Network-block inside remove-block, remove that network-block
+			blocks[i] = nil
+			i++
+		// From here on we have some sort of overlap
+		} else if blocks[i].first.Cmp(removes[j].first) >= 0 {
+			// Network-block starts inside remove-block, adjust start of network-block
+			tmp := big.NewInt(1)
+			blocks[i].first = tmp.Add(tmp, removes[j].last)
+			j++
+		} else if blocks[i].last.Cmp(removes[j].last) <= 0 {
+			// Network-block ends inside remove-block, adjust end of network-block
+			tmp := big.NewInt(0)
+			blocks[i].last = tmp.Sub(tmp.Add(tmp, removes[j].first), big.NewInt(1))
+			i++
+		} else {
+			// Remove-block inside network-block, will split network-block into two new blocks
+			//
+			// Make room for new network block
+			blocks = append(blocks, nil)
+			copy(blocks[i+1:], blocks[i:])
+			blocks[i] = new(cidrBlock6)
+			// update first half of the network-block (new)
+			blocks[i].first = blocks[i+1].first
+			tmp := big.NewInt(0)
+			blocks[i].last = tmp.Sub(tmp.Add(tmp, removes[j].first), big.NewInt(1))
+			// Update second half of the network-block (old)
+			tmp = big.NewInt(1)
+			tmp.Add(tmp, removes[j].last)
+			blocks[i+1].first = tmp
+			i++
+			j++
+		}
+	}
+
+	var merged []*net.IPNet
+	for _, block := range blocks {
+		if block == nil {
+			continue
+		}
+
+		if err := splitRange6(big.NewInt(0), 0, block.first, block.last, &merged); err != nil {
+			return nil, err
+		}
+	}
+
+	return merged, nil
+}

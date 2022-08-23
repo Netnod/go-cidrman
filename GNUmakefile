@@ -11,8 +11,11 @@ build:
 test:
 	go test $(TEST) -timeout=30s -parallel=4
 
+clean:
+	go clean -testcache
+
 fmt:
 	@echo "==> Fixing source code with gofmt..."
 	gofmt -s -w ./$(PKG_NAME)
 
-.PHONY: build test fmt
+.PHONY: build test clean fmt

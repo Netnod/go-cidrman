@@ -177,3 +177,66 @@ func merge4(blocks cidrBlock4s) ([]*net.IPNet, error) {
 
 	return merged, nil
 }
+
+// remove4 accepts two lists of IPv4 networks and removes the second list from the first and return a new list of IPNets.
+// The remove will return the smallest possible list of IPNets.
+func remove4(blocks, removes cidrBlock4s) ([]*net.IPNet, error) {
+	sort.Sort(blocks)
+	sort.Sort(removes)
+
+	i := 0
+	j := 0
+	for i < len(blocks) {
+		if j >= len(removes) {
+			// No more remove blocks to compare with
+			break
+		}
+		if removes[j].last < blocks[i].first {
+			// Remove-block entirely before network-block, use next remove-block
+			j++
+		} else if blocks[i].last < removes[j].first {
+			// Network-block entirely before remove-block, keep block and continue to next
+			i++
+		} else if blocks[i].first >= removes[j].first && blocks[i].last <= removes[j].last {
+			// Network-block inside remove-block, remove that network-block
+			blocks[i] = nil
+			i++
+		// From here on we have some sort of overlap
+		} else if blocks[i].first >= removes[j].first {
+			// Network-block starts inside remove-block, adjust start of network-block
+			blocks[i].first = removes[j].last + 1
+			j++
+		} else if blocks[i].last <= removes[j].last {
+			// Network-block ends inside remove-block, adjust end of network-block
+			blocks[i].last = removes[j].first - 1
+			i++
+		} else {
+			// Remove-block inside network-block, will split network-block into two new blocks
+			//
+			// Make room for new network block
+			blocks = append(blocks, nil)
+			copy(blocks[i+1:], blocks[i:])
+			blocks[i] = new(cidrBlock4)
+			// update first half of the network-block (new)
+			blocks[i].first = blocks[i+1].first
+			blocks[i].last = removes[j].first - 1
+			// Update second half of the network-block (old)
+			blocks[i+1].first = removes[j].last + 1
+			i++
+			j++
+		}
+	}
+
+	var merged []*net.IPNet
+	for _, block := range blocks {
+		if block == nil {
+			continue
+		}
+
+		if err := splitRange4(0, 0, block.first, block.last, &merged); err != nil {
+			return nil, err
+		}
+	}
+
+	return merged, nil
+}
