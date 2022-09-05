@@ -33,7 +33,7 @@ func RemoveIPNets(nets, rmnets []*net.IPNet) ([]*net.IPNet, error) {
 	}
 
 	// Split into IPv4 and IPv6 lists.
-	// Merge the list separately and then combine.
+	// Handle the lists separately and then combine.
 	var block4s cidrBlock4s
 	var block6s cidrBlock6s
 	for _, net := range nets {
