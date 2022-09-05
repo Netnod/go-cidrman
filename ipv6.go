@@ -5,6 +5,7 @@ import (
 	"math/big"
 	"net"
 	"sort"
+	"errors"
 )
 
 const widthUInt128 = 128
@@ -253,4 +254,10 @@ func remove6(blocks, removes cidrBlock6s) ([]*net.IPNet, error) {
 	}
 
 	return merged, nil
+}
+
+// subset6 accepts two lists of IPv6 networks and return a new list of IPNets that exsists/overlaps in both lists.
+// The subset6() will return the smallest possible list of IPNets.
+func subset6(blocks, subsets cidrBlock6s) ([]*net.IPNet, error) {
+	return nil, errors.New("subset6() not implemented yet")
 }

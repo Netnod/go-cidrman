@@ -6,6 +6,7 @@ import (
 	"math"
 	"net"
 	"sort"
+	"errors"
 )
 
 const widthUInt32 = 32
@@ -239,4 +240,10 @@ func remove4(blocks, removes cidrBlock4s) ([]*net.IPNet, error) {
 	}
 
 	return merged, nil
+}
+
+// subset4 accepts two lists of IPv4 networks and return a new list of IPNets that exsists/overlaps in both lists.
+// The subset4() will return the smallest possible list of IPNets.
+func subset4(blocks, subsets cidrBlock4s) ([]*net.IPNet, error) {
+	return nil, errors.New("subset4() not implemented yet")
 }
