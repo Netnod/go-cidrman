@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestRremoveCIDRs(t *testing.T) {
+func TestRemoveCIDRs(t *testing.T) {
 	type TestCase struct {
 		Input  []string
 		Remove []string
