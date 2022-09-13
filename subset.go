@@ -16,10 +16,16 @@ func SubsetIPNets(nets, subsetnets []*net.IPNet) ([]*net.IPNet, error) {
 		return make([]*net.IPNet, 0), nil
 	}
 	if subsetnets == nil {
-		return nets, nil
+		// With empty subset, return empty result
+		return make([]*net.IPNet, 0), nil
+		// Alternative to return nets unchanged
+		//return nets, nil
 	}
 	if len(subsetnets) == 0 {
-		return nets, nil
+		// With empty subset, return empty result
+		return make([]*net.IPNet, 0), nil
+		// Alternative to return nets unchanged
+		//return nets, nil
 	}
 
 	// Merge nets and subsetnets individually to have the miminal set of largets networks
@@ -86,10 +92,16 @@ func SubsetCIDRs(cidrs, subsets []string) ([]string, error) {
 		return make([]string, 0), nil
 	}
 	if subsets == nil {
-		return cidrs, nil
+		// With empty subset, return empty result
+		return make([]string, 0), nil
+		// Alternative to return cidrs unchanged
+		//return cidrs, nil
 	}
 	if len(subsets) == 0 {
-		return cidrs, nil
+		// With empty subset, return empty result
+		return make([]string, 0), nil
+		// Alternative to return cidrs unchanged
+		//return cidrs, nil
 	}
 
 	var networks []*net.IPNet
