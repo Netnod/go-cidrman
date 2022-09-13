@@ -57,14 +57,20 @@ func SubsetIPNets(nets, subsetnets []*net.IPNet) ([]*net.IPNet, error) {
 		}
 	}
 
-	new4s, err := subset4(block4s, subset4s)
-	if err != nil {
-		return nil, err
+	var new4s []*net.IPNet
+	if len(block4s) > 0 {
+		new4s, err = subset4(block4s, subset4s)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	new6s, err := subset6(block6s, subset6s)
-	if err != nil {
-		return nil, err
+	var new6s []*net.IPNet
+	if len(block6s) > 0 {
+		new6s, err = subset6(block6s, subset6s)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	merged := append(new4s, new6s...)
