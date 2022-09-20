@@ -250,9 +250,9 @@ func subset4(blocks, subsets cidrBlock4s) ([]*net.IPNet, error) {
 	i := 0
 	j := 0
 	for i < len(blocks) {
-		if j >= len(subsets) || subsets[j].last < blocks[i].first {
-			// No more subset blocks to compare with, or
-			// network-block entirely before subset-block, remove block and continue to next
+		if j >= len(subsets) || blocks[i].last < subsets[j].first {
+			// No more subset blocks to compare with (then no more network blocks to keep), or
+			// network-block entirely before subset-block, remove block and continue with next
 			//
 			// Clear network-block and continue to next
 			blocks[i] = nil
@@ -267,6 +267,7 @@ func subset4(blocks, subsets cidrBlock4s) ([]*net.IPNet, error) {
 		} else if blocks[i].first >= subsets[j].first {
 			// Network-block starts inside subset-block, adjust end of network-block
 			blocks[i].last = subsets[j].last
+			i++
 			j++
 		} else if blocks[i].last <= subsets[j].last {
 			// Network-block ends inside subset-block, adjust start of network-block
