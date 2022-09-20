@@ -8,9 +8,10 @@ This is a fork from [EvilSuperstars/go-cidrman](https://github.com/EvilSuperstar
 
 ## Background
 
-*Note:* This project uses [Go Modules](https://blog.golang.org/using-go-modules) making it safe to work with it outside of
-your existing [GOPATH](http://golang.org/doc/code.html#GOPATH). The instructions that follow assume a directory in your
-home directory outside of the standard GOPATH (i.e `$HOME/git/GitHub/Netnod/go-cidrman/`).
+*Note:* This project uses [Go Modules](https://blog.golang.org/using-go-modules) making it
+safe to work with it outside of your existing [GOPATH](http://golang.org/doc/code.html#GOPATH).
+The instructions that follow assume a directory in your home directory
+outside of the standard GOPATH (i.e `$HOME/git/GitHub/Netnod/go-cidrman/`).
 
 # Build instructions
 
@@ -51,7 +52,8 @@ $ make clean
 ## Findings about the original project
 
 A lot of work was done in the `ipv6-experimental` branch in February and December 2017.
-In June 2019, some of the *metafiles* in the `master` branch were created or updated, without changes to the code itself.
+In June 2019, some of the *metafiles* in the `master` branch were created or updated,
+without changes to the code itself.
 
 ## Where are we now?
 
@@ -64,13 +66,11 @@ In April 2022, a `merge-experimental` branch was temporarily used to merge the o
 together with the IPv6 support developed in this fork.
 With IPv6 support now in `main`, the `ipv6-experimental` branch was removed as it's no longer relevant in this fork.
 
-New `RemoveCIDRs` functions were added (in June 2022) to remove/exclude CIDR blocks or IP ranges.
+New `RemoveCIDRs` functions added (in June 2022) to remove/exclude CIDR blocks or IP ranges.
 
-## Next to come
-
-New `SubsetCIDRs` functions in progress to select specific CIDR blocks or IP ranges to keep.
-A bit lite the oposite of RemoveCIDRs, this selects what to keep instead of what to remove.
+New `SubsetCIDRs` functions added (in September 2022) to select specific CIDR blocks or IP ranges to keep.
+A bit like the oposite of RemoveCIDRs, `SubsetCIDRs` selects what to keep instead of what to remove.
 
 ## The future
 
-For the time being, all needed features have been added to support Netnod's internal development needs.
+For now, all necessary features have been added to support Netnod's internal development needs.
