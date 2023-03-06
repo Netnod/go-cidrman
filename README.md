@@ -71,6 +71,6 @@ New `RemoveCIDRs` functions added (in June 2022) to remove/exclude CIDR blocks o
 New `SubsetCIDRs` functions added (in September 2022) to select specific CIDR blocks or IP ranges to keep.
 A bit like the oposite of RemoveCIDRs, `SubsetCIDRs` selects what to keep instead of what to remove.
 
-## The future
+## Upcoming
 
-For now, all necessary features have been added to support Netnod's internal development needs.
+New `DiffCIDRs` functions are planned to compare two lists of CIDR blocks or IP ranges.
