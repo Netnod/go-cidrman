@@ -240,3 +240,70 @@ func remove4(blocks, removes cidrBlock4s) ([]*net.IPNet, error) {
 
 	return merged, nil
 }
+
+// subset4 accepts two lists of IPv4 networks and return a new list of IPNets that exsists/overlaps in both lists.
+// The subset4() will return the smallest possible list of IPNets.
+func subset4(blocks, subsets cidrBlock4s) ([]*net.IPNet, error) {
+	sort.Sort(blocks)
+	sort.Sort(subsets)
+
+	i := 0
+	j := 0
+	for i < len(blocks) {
+		if j >= len(subsets) || blocks[i].last < subsets[j].first {
+			// No more subset blocks to compare with (then no more network blocks to keep), or
+			// network-block entirely before subset-block, remove block and continue with next
+			//
+			// Clear network-block and continue to next
+			blocks[i] = nil
+			i++
+		} else if subsets[j].last < blocks[i].first {
+			// Subset-block entirely before network-block, use next subset-block
+			j++
+		} else if blocks[i].first >= subsets[j].first && blocks[i].last <= subsets[j].last {
+			// Network-block inside subset-block, keep that network-block
+			i++
+		// From here on we have some sort of overlap
+		} else if blocks[i].first >= subsets[j].first {
+			// Network-block starts inside subset-block, adjust end of network-block
+			blocks[i].last = subsets[j].last
+			i++
+			j++
+		} else if blocks[i].last <= subsets[j].last {
+			// Network-block ends inside subset-block, adjust start of network-block
+			blocks[i].first = subsets[j].first
+			i++
+		} else {
+			// Subset-block inside network-block, adjust both start and end of network-block
+			blocks[i].first = subsets[j].first
+			// Check if next subset-block exists and starts with network-block
+			if j < len(subsets) - 1 && subsets[j+1].first < blocks[i].last {
+				// Make room for new network block
+				blocks = append(blocks, nil)
+				copy(blocks[i+1:], blocks[i:])
+				blocks[i] = new(cidrBlock4)
+				// update first half of the network-block (new)
+				blocks[i].first = subsets[j].first
+				// Update second half of the network-block (old)
+				blocks[i+1].first = subsets[j+1].first
+			}
+			// Finaly handle (first) network-block's last address
+			blocks[i].last = subsets[j].last
+			i++
+			j++
+		}
+	}
+
+	var overlaps []*net.IPNet
+	for _, block := range blocks {
+		if block == nil {
+			continue
+		}
+
+		if err := splitRange4(0, 0, block.first, block.last, &overlaps); err != nil {
+			return nil, err
+		}
+	}
+
+	return overlaps, nil
+}

@@ -254,3 +254,70 @@ func remove6(blocks, removes cidrBlock6s) ([]*net.IPNet, error) {
 
 	return merged, nil
 }
+
+// subset6 accepts two lists of IPv6 networks and return a new list of IPNets that exsists/overlaps in both lists.
+// The subset6() will return the smallest possible list of IPNets.
+func subset6(blocks, subsets cidrBlock6s) ([]*net.IPNet, error) {
+	sort.Sort(blocks)
+	sort.Sort(subsets)
+
+	i := 0
+	j := 0
+	for i < len(blocks) {
+		if j >= len(subsets) || blocks[i].last.Cmp(subsets[j].first) < 0 {
+			// No more subset blocks to compare with (then no more network blocks to keep), or
+			// network-block entirely before subset-block, remove block and continue with next
+			//
+			// Clear network-block and continue to next
+			blocks[i] = nil
+			i++
+		} else if subsets[j].last.Cmp(blocks[i].first) < 0 {
+			// Subset-block entirely before network-block, use next subset-block
+			j++
+		} else if blocks[i].first.Cmp(subsets[j].first) >= 0 && blocks[i].last.Cmp(subsets[j].last) <= 0 {
+			// Network-block inside subset-block, keep that network-block
+			i++
+		// From here on we have some sort of overlap
+		} else if blocks[i].first.Cmp(subsets[j].first) >= 0 {
+			// Network-block starts inside subset-block, adjust end of network-block
+			blocks[i].last = subsets[j].last
+			i++
+			j++
+		} else if blocks[i].last.Cmp(subsets[j].last) <= 0 {
+			// Network-block ends inside subset-block, adjust start of network-block
+			blocks[i].first = subsets[j].first
+			i++
+		} else {
+			// Subset-block inside network-block, adjust both start and end of network-block
+			blocks[i].first = subsets[j].first
+			// Check if next subset-block exists and starts with network-block
+			if j < len(subsets) - 1 && subsets[j+1].first.Cmp(blocks[i].last) < 0 {
+				// Make room for new network block
+				blocks = append(blocks, nil)
+				copy(blocks[i+1:], blocks[i:])
+				blocks[i] = new(cidrBlock6)
+				// update first half of the network-block (new)
+				blocks[i].first = subsets[j].first
+				// Update second half of the network-block (old)
+				blocks[i+1].first = subsets[j+1].first
+			}
+			// Finaly handle (first) network-block's last address
+			blocks[i].last = subsets[j].last
+			i++
+			j++
+		}
+	}
+
+	var overlaps []*net.IPNet
+	for _, block := range blocks {
+		if block == nil {
+			continue
+		}
+
+		if err := splitRange6(big.NewInt(0), 0, block.first, block.last, &overlaps); err != nil {
+			return nil, err
+		}
+	}
+
+	return overlaps, nil
+}

@@ -14,7 +14,6 @@ func (nets ipNets) toCIDRs() []string {
 	for _, net := range nets {
 		cidrs = append(cidrs, net.String())
 	}
-
 	return cidrs
 }
 
@@ -29,7 +28,7 @@ func MergeIPNets(nets []*net.IPNet) ([]*net.IPNet, error) {
 	}
 
 	// Split into IPv4 and IPv6 lists.
-	// Merge the list separately and then combine.
+	// Handle the lists separately and then combine.
 	var block4s cidrBlock4s
 	var block6s cidrBlock6s
 	for _, net := range nets {
@@ -42,14 +41,21 @@ func MergeIPNets(nets []*net.IPNet) ([]*net.IPNet, error) {
 		}
 	}
 
-	merged4, err := merge4(block4s)
-	if err != nil {
-		return nil, err
+	var merged4 []*net.IPNet
+	var err error
+	if len(block4s) > 0 {
+		merged4, err = merge4(block4s)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	merged6, err := merge6(block6s)
-	if err != nil {
-		return nil, err
+	var merged6 []*net.IPNet
+	if len(block6s) > 0 {
+		merged6, err = merge6(block6s)
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	merged := append(merged4, merged6...)
