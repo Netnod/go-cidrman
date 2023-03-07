@@ -69,7 +69,7 @@ With IPv6 support now in `main`, the `ipv6-experimental` branch was removed as i
 New `RemoveCIDRs` functions added (in June 2022) to remove/exclude CIDR blocks or IP ranges.
 
 New `SubsetCIDRs` functions added (in September 2022) to select specific CIDR blocks or IP ranges to keep.
-A bit like the oposite of RemoveCIDRs, `SubsetCIDRs` selects what to keep instead of what to remove.
+A bit like the opposite of RemoveCIDRs, `SubsetCIDRs` selects what to keep instead of what to remove.
 
 ## Upcoming
 
