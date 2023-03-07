@@ -417,7 +417,10 @@ func TestRemoveCIDRs(t *testing.T) {
 			if !testCase.Error {
 				t.Errorf("RemoveCIDRs(%#v, %#v) failed: %s", testCase.Input, testCase.Remove, err.Error())
 			}
+		} else if testCase.Error {
+			t.Errorf("RemoveCIDRs(%#v, %#v) didn't return with error as expected", testCase.Input, testCase.Remove)
 		}
+
 		if !reflect.DeepEqual(testCase.Output, output) {
 			t.Errorf("RemoveCIDRs(%#v, %#v) expected: %#v, got: %#v", testCase.Input, testCase.Remove, testCase.Output, output)
 		}
