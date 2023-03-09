@@ -72,14 +72,14 @@ func DiffIPNets(leftnets, rightnets []*net.IPNet) (leftunique, inboth, rightuniq
 	// Create leftunique
 	var leftunique4s []*net.IPNet
 	if len(left4s) > 0 {
-		leftunique4s, err = remove4(left4s, right4s)
+		leftunique4s, err = remove4(copy4s(left4s), copy4s(right4s))
 		if err != nil {
 			return nil, nil, nil, -1, fmt.Errorf("Error in creating leftunique4s: %w", err)
 		}
 	}
 	var leftunique6s []*net.IPNet
 	if len(left6s) > 0 {
-		leftunique6s, err = remove6(left6s, right6s)
+		leftunique6s, err = remove6(copy6s(left6s), copy6s(right6s))
 		if err != nil {
 			return nil, nil, nil, -1, fmt.Errorf("Error in creating leftunique6s: %w", err)
 		}
@@ -89,14 +89,14 @@ func DiffIPNets(leftnets, rightnets []*net.IPNet) (leftunique, inboth, rightuniq
 	// Create rightunique
 	var rightunique4s []*net.IPNet
 	if len(right4s) > 0 {
-		rightunique4s, err = remove4(right4s, left4s)
+		rightunique4s, err = remove4(copy4s(right4s), copy4s(left4s))
 		if err != nil {
 			return nil, nil, nil, -1, fmt.Errorf("Error in creating rightunique4s: %w", err)
 		}
 	}
 	var rightunique6s []*net.IPNet
 	if len(right6s) > 0 {
-		rightunique6s, err = remove6(right6s, left6s)
+		rightunique6s, err = remove6(copy6s(right6s), copy6s(left6s))
 		if err != nil {
 			return nil, nil, nil, -1, fmt.Errorf("Error in creating rightunique6s: %w", err)
 		}
