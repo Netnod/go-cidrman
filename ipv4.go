@@ -148,6 +148,24 @@ func (c cidrBlock4s) Swap(i, j int) {
 	c[i], c[j] = c[j], c[i]
 }
 
+// make a copy of list of CIDRs as most functions below will will destroy the original list(s)
+// can be used like this if 'blocks' and 'removes' has to be re-used later
+//    		result, err = remove4(copy4s(blocks), copy4s(removes))
+func copy4s(inblocks cidrBlock4s) cidrBlock4s {
+	outblocks := make(cidrBlock4s, len(inblocks))
+	for i, ptr := range inblocks {
+		if ptr == nil {
+			// Skip to next for nil source pointer
+			continue
+		}
+		// Create shallow copy of source cidrBlock
+		newblock := *ptr
+
+		outblocks[i] = &newblock
+	}
+	return outblocks
+}
+
 // merge4 accepts a list of IPv4 networks and merges them into the smallest possible list of IPNets.
 // It merges adjacent subnets where possible, those contained within others and removes any duplicates.
 func merge4(blocks cidrBlock4s) ([]*net.IPNet, error) {

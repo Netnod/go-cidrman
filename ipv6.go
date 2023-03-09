@@ -156,6 +156,24 @@ func (c cidrBlock6s) Swap(i, j int) {
 	c[i], c[j] = c[j], c[i]
 }
 
+// make a copy of list of CIDRs as most functions below will will destroy the original list(s)
+// can be used like this if 'blocks' and 'removes' has to be re-used later
+//    		result, err = remove6(copy6s(blocks), copy6s(removes))
+func copy6s(inblocks cidrBlock6s) cidrBlock6s {
+	outblocks := make(cidrBlock6s, len(inblocks))
+	for i, ptr := range inblocks {
+		if ptr == nil {
+			// Skip to next for nil source pointer
+			continue
+		}
+		// Create shallow copy of source cidrBlock
+		newblock := *ptr
+
+		outblocks[i] = &newblock
+	}
+	return outblocks
+}
+
 // merge6 accepts a list of IPv6 networks and merges them into the smallest possible list of IPNets.
 // It merges adjacent subnets where possible, those contained within others and removes any duplicates.
 func merge6(blocks cidrBlock6s) ([]*net.IPNet, error) {
