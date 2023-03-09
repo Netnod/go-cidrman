@@ -66,6 +66,7 @@ func TestIPv4(t *testing.T) {
 			if !testCase.Error {
 				t.Errorf("net.ParseCIDR(%#v) failed: %s", testCase.Input, err.Error())
 			}
+			continue
 		} else if testCase.Error {
 			t.Errorf("net.ParseCIDR(%#v) didn't return with error as expected", testCase.Input)
 		}
