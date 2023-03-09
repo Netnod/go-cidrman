@@ -136,7 +136,7 @@ func DiffIPNets(leftnets, rightnets []*net.IPNet) (leftunique, inboth, rightuniq
 
 // DiffCIDRs accepts two lists of mixed CIDR blocks and return three lists of
 // CIDRs that  only exists in first list, second lost and in both lists, together with a status number.
-func DiffCIDRs(leftcidrs, rightcidrs []string) ([]string, []string, []string, int, error) {
+func DiffCIDRs(leftcidrs, rightcidrs []string) (leftreturn []string, bothreturn []string, rightreturn []string, status int, err error) {
 	if leftcidrs == nil || rightcidrs == nil {
 		return nil, nil, nil, -2, fmt.Errorf("Missing input data in DiffCIDRs()")
 	}
@@ -172,5 +172,22 @@ func DiffCIDRs(leftcidrs, rightcidrs []string) ([]string, []string, []string, in
 		return nil, nil, nil, status, err
 	}
 
-	return ipNets(leftNets).toCIDRs(), ipNets(bothNets).toCIDRs(), ipNets(rightNets).toCIDRs(), status, nil
+	// Handle the situation empty data
+	if len(leftNets) == 0 {
+		leftreturn = make([]string, 0)
+	} else {
+		leftreturn = ipNets(leftNets).toCIDRs()
+	}
+	if len(bothNets) == 0 {
+		bothreturn = make([]string, 0)
+	} else {
+		bothreturn = ipNets(bothNets).toCIDRs()
+	}
+	if len(rightNets) == 0 {
+		rightreturn = make([]string, 0)
+	} else {
+		rightreturn = ipNets(rightNets).toCIDRs()
+	}
+
+	return leftreturn, bothreturn, rightreturn, status, nil
 }
