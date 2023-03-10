@@ -6,7 +6,7 @@ import (
 )
 
 // DiffIPNets accepts two lists of mixed IP networks and return three lists of
-// IPNets that only exists in first list, second lost and in both lists, together with a status number.
+// IPNets that only exists in first list, second list and in both lists, together with a status number.
 // The DiffIPNets() will return the smallest possible lists of IPNets.
 // Example:
 //    onlyInLeftNets, inBothNets, onlyInRightNets, status, err := DiffIPNets(leftListOfNets, rightListOfNets)
