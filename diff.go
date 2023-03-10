@@ -34,91 +34,18 @@ func DiffIPNets(leftnets, rightnets []*net.IPNet) (leftunique, inboth, rightuniq
 		return leftnets, make([]*net.IPNet, 0), make([]*net.IPNet, 0), 2, nil
 	}
 
-	// Merge nets and subsetnets individually to have the miminal set of largets networks
-	leftnets, err = MergeIPNets(leftnets)
+	leftunique, err = RemoveIPNets(leftnets, rightnets)
 	if err != nil {
-		return nil, nil, nil, -1, fmt.Errorf("Merge error leftnets: %w", err)
+		return nil, nil, nil, -1, fmt.Errorf("Error in creating leftunique: %w", err)
 	}
-	rightnets, err = MergeIPNets(rightnets)
+	rightunique, err = RemoveIPNets(rightnets, leftnets)
 	if err != nil {
-		return nil, nil, nil, -1, fmt.Errorf("Merge error rightnets: %w", err)
+		return nil, nil, nil, -1, fmt.Errorf("Error in creating rightunique: %w", err)
 	}
-
-	// Split into IPv4 and IPv6 lists.
-	// Handle the list separately.
-	var left4s cidrBlock4s
-	var left6s cidrBlock6s
-	for _, net := range leftnets {
-		ip4 := net.IP.To4()
-		if ip4 != nil {
-			left4s = append(left4s, newBlock4(ip4, net.Mask))
-		} else {
-			ip6 := net.IP.To16()
-			left6s = append(left6s, newBlock6(ip6, net.Mask))
-		}
+	inboth, err = SubsetIPNets(leftnets, rightnets)
+	if err != nil {
+		return nil, nil, nil, -1, fmt.Errorf("Error in creating inboth: %w", err)
 	}
-	var right4s cidrBlock4s
-	var right6s cidrBlock6s
-	for _, net := range rightnets {
-		ip4 := net.IP.To4()
-		if ip4 != nil {
-			right4s = append(right4s, newBlock4(ip4, net.Mask))
-		} else {
-			ip6 := net.IP.To16()
-			right6s = append(right6s, newBlock6(ip6, net.Mask))
-		}
-	}
-
-	// Create leftunique
-	var leftunique4s []*net.IPNet
-	if len(left4s) > 0 {
-		leftunique4s, err = remove4(copy4s(left4s), copy4s(right4s))
-		if err != nil {
-			return nil, nil, nil, -1, fmt.Errorf("Error in creating leftunique4s: %w", err)
-		}
-	}
-	var leftunique6s []*net.IPNet
-	if len(left6s) > 0 {
-		leftunique6s, err = remove6(copy6s(left6s), copy6s(right6s))
-		if err != nil {
-			return nil, nil, nil, -1, fmt.Errorf("Error in creating leftunique6s: %w", err)
-		}
-	}
-	leftunique = append(leftunique4s, leftunique6s...)
-
-	// Create rightunique
-	var rightunique4s []*net.IPNet
-	if len(right4s) > 0 {
-		rightunique4s, err = remove4(copy4s(right4s), copy4s(left4s))
-		if err != nil {
-			return nil, nil, nil, -1, fmt.Errorf("Error in creating rightunique4s: %w", err)
-		}
-	}
-	var rightunique6s []*net.IPNet
-	if len(right6s) > 0 {
-		rightunique6s, err = remove6(copy6s(right6s), copy6s(left6s))
-		if err != nil {
-			return nil, nil, nil, -1, fmt.Errorf("Error in creating rightunique6s: %w", err)
-		}
-	}
-	rightunique = append(rightunique4s, rightunique6s...)
-
-	// Create inboth
-	var inboth4s []*net.IPNet
-	if len(left4s) > 0 {
-		inboth4s, err = subset4(left4s, right4s)
-		if err != nil {
-			return nil, nil, nil, -1, fmt.Errorf("Error in creating inboth4s: %w", err)
-		}
-	}
-	var inboth6s []*net.IPNet
-	if len(left6s) > 0 {
-		inboth6s, err = subset6(left6s, right6s)
-		if err != nil {
-			return nil, nil, nil, -1, fmt.Errorf("Error in creating inboth6s: %w", err)
-		}
-	}
-	inboth = append(inboth4s, inboth6s...)
 
 	if len(inboth) == 0 {
 		status = 4
