@@ -373,8 +373,10 @@ func TestMergeCIDRs(t *testing.T) {
 			if !testCase.Error {
 				t.Errorf("MergeCIDRS(%#v) failed: %s", testCase.Input, err.Error())
 			}
-			continue
+		} else if testCase.Error {
+			t.Errorf("MergeCIDRS(%#v) didn't return with error as expected", testCase.Input)
 		}
+
 		if !reflect.DeepEqual(testCase.Output, output) {
 			t.Errorf("MergeCIDRS(%#v) expected: %#v, got: %#v", testCase.Input, testCase.Output, output)
 		}

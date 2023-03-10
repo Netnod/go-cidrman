@@ -470,7 +470,10 @@ func TestSubsetCIDRs(t *testing.T) {
 			if !testCase.Error {
 				t.Errorf("SubsetCIDRs(%#v, %#v) failed: %s", testCase.Input, testCase.Subset, err.Error())
 			}
+		} else if testCase.Error {
+			t.Errorf("SubsetCIDRs(%#v, %#v) didn't return with error as expected", testCase.Input, testCase.Subset)
 		}
+
 		if !reflect.DeepEqual(testCase.Output, output) {
 			t.Errorf("SubsetCIDRs(%#v, %#v) expected: %#v, got: %#v", testCase.Input, testCase.Subset, testCase.Output, output)
 		}
